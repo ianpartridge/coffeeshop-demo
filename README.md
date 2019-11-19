@@ -129,41 +129,49 @@ The dashboard shows that the load is dispatched among the baristas.
 1. Build Docker Images
    Use the following script to build the Docker images for the three microservices:
     ```bash
+    ./build.bat
+    ```
+    or 
+    ```bash
     ./build.sh
     ```
 1. Run Kafka and the microservices together using Docker Compose:
     ```bash
     docker-compose up
     ```
+1. Clean up docker
+    ```bash
+    docker-compose down
+    ```
 
 # Instructions to run containers using Kubernetes
 
-1. Build Docker Images
-    * Barista-Kafka
+1. Build docker images
     ```bash
-    docker build -f barista-kafka/Dockerfile . -t barista-kafka
+    ./build.bat
     ```
-    * Barista-HTTP
+    or 
     ```bash
-    docker build -f barista-http/Dockerfile . -t barista-http
+    ./build.sh
     ```
-    * Coffeeshop-Service
+1. Run the kubernetes deployments and services
     ```bash
-    docker build -f coffeeshop-service/Dockerfile . -t coffeeshop-service
+    ./apply-kubernetes.bat
     ```
-1. Run zookeeper and kafka server
+    or
     ```bash
-    kubectl apply -f zookeeper-deployment.yaml
-    kubectl apply -f zookeeper-service.yaml
-    kubectl apply -f kafka-deployment.yaml
-    kubectl apply -f kafka-service.yaml
+    ./apply-kubernetes.sh
     ```
-1. Run services
+1. Expose the coffeeshop-service to be accessible externally
     ```bash
-    kubectl apply -f barista-kafka/deployment.yml
-    kubectl apply -f barista-kafka/service.yml
-    kubectl apply -f coffeeshop-service/deployment.yml
-    kubectl apply -f coffeeshop-service/service.yml
-    kubectl apply -f barista-http/deployment.yml
-    kubectl apply -f barista-http/service.yml
+    kubectl port-forward <COFFEESHOP POD> 8080:8080
+
+    ```
+1. Clean up kubernetes resource when done
+    ```bash
+    ./delete-kubernetes.bat
+    ```
+    or
+    ```bash
+    ./delete-kubernetes.sh
     ```
