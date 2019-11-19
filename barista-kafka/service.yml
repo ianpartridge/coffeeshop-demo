@@ -6,7 +6,7 @@ spec:
   ports:
   - port: 8090
     protocol: TCP
-    targetPort: 3000
+    targetPort: 8090
   selector:
     app: barista-kafka-deployment
   type: ClusterIP

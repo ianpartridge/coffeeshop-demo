@@ -6,7 +6,7 @@ spec:
   ports:
   - port: 8080
     protocol: TCP
-    targetPort: 3001
+    targetPort: 8080
   selector:
     app: coffeeshop-service-deployment
   type: ClusterIP
