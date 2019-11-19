@@ -1,20 +1,31 @@
-## Maven package
-FROM quay.io/quarkus/centos-quarkus-maven:19.2.1 AS build
+FROM adoptopenjdk/openjdk8-openj9:x86_64-ubi-minimal-jdk8u232-b09_openj9-0.17.0 AS build
+WORKDIR /
 
-COPY barista-kafka/src /usr/src/app/barista-kafka/src
-COPY barista-kafka/pom.xml /usr/src/app/barista-kafka
+# Install maven
+RUN curl -LO https://www-us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz && tar -xzf apache-maven-3.6.2-bin.tar.gz && export PATH=/apache-maven-3.6.2/bin:$PATH && mvn -version
+ENV PATH=/apache-maven-3.6.2/bin:$PATH
 
-COPY pom.xml /usr/src/app
+WORKDIR /project
 
-USER root
-RUN chown -R quarkus /usr/src/app
-USER quarkus
-RUN mvn -f /usr/src/app/barista-kafka/pom.xml -Pnative clean package
+# Copy project POM
+COPY barista-kafka/pom.xml /project/barista-kafka/pom.xml
+COPY pom.xml /project/
+
+# Download dependencies
+RUN mvn -f barista-kafka/pom.xml clean dependency:resolve
+
+# Copy application sources
+COPY barista-kafka/src /project/barista-kafka/src
+
+# Build and package
+RUN mvn -f barista-kafka/pom.xml package
 
 ## Create Image
-FROM registry.access.redhat.com/ubi8/ubi-minimal
-WORKDIR /work/
-COPY --from=build /usr/src/app/barista-kafka/target/*-runner /work/application
-RUN chmod 775 /work
+FROM adoptopenjdk/openjdk8-openj9:x86_64-ubi-minimal-jre8u232-b09_openj9-0.17.0
+COPY --from=build /project/barista-kafka/target/lib /project/lib
+COPY --from=build /project/barista-kafka/target/*-runner.jar /project/app.jar
+WORKDIR /project
+
 EXPOSE 8090
-CMD ["./application", "-Dkafka.bootstrap.servers=kafka:9093"]
+
+CMD ["java", "-Dkafka.bootstrap.servers=kafka:9093", "-jar", "app.jar"]
