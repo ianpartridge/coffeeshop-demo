@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coffeeshop-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coffeeshop-service-deployment
+  template:
+    metadata:
+      labels:
+        app: coffeeshop-service-deployment
+    spec:
+      containers:
+      - name: coffeeshop-service-container
+        image: coffeeshop-service
+        ports:
+          - containerPort: 8080
+        imagePullPolicy: Never

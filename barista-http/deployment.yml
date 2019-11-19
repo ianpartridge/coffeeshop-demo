@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: barista-http-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: barista-http-deployment
+  template:
+    metadata:
+      labels:
+        app: barista-http-deployment
+    spec:
+      containers:
+      - name: barista-http-container
+        image: barista-http
+        ports:
+          - containerPort: 8082
+        imagePullPolicy: Never

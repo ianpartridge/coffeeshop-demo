@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: barista-kafka-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: barista-kafka-deployment
+  template:
+    metadata:
+      labels:
+        app: barista-kafka-deployment
+    spec:
+      containers:
+      - name: barista-kafka-container
+        image: barista-kafka
+        ports:
+          - containerPort: 8090
+        imagePullPolicy: Never
