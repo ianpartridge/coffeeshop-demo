@@ -43,6 +43,7 @@ spec:
         name: kafka
         ports:
         - containerPort: 9092
+        - containerPort: 9093
         resources: {}
       restartPolicy: Always
 status: {}

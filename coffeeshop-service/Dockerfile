@@ -28,4 +28,4 @@ WORKDIR /project
 
 EXPOSE 8080
 
-CMD ["java", "-Dkafka.bootstrap.servers=kafka:9093", "-Dme.escoffier.quarkus.coffeeshop.http.BaristaService/mp-rest/url=http://barista-http-cluster-ip:8082", "-jar", "app.jar"]
+CMD ["java", "-Dkafka.bootstrap.servers=kafka:9093", "-Dme.escoffier.quarkus.coffeeshop.http.BaristaService/mp-rest/url=http://barista-http:8082", "-jar", "app.jar"]
