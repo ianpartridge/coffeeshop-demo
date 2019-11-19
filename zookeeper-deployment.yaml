@@ -1,37 +1,27 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: C:\Kompose\kompose.exe convert
-    kompose.version: 1.19.0 (f63a961c)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: zookeeper
   name: zookeeper
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app: zookeeper
   template:
     metadata:
-      annotations:
-        kompose.cmd: C:\Kompose\kompose.exe convert
-        kompose.version: 1.19.0 (f63a961c)
-      creationTimestamp: null
       labels:
-        io.kompose.service: zookeeper
+        app: zookeeper
     spec:
       containers:
-      - args:
-        - sh
-        - -c
-        - bin/zookeeper-server-start.sh config/zookeeper.properties
-        env:
-        - name: LOG_DIR
-          value: /tmp/logs
+      - name: zookeeper
         image: strimzi/kafka:0.11.3-kafka-2.1.0
-        name: zookeeper
+        args:
+          - sh
+          - -c
+          - bin/zookeeper-server-start.sh config/zookeeper.properties
+        env:
+          - name: LOG_DIR
+            value: /tmp/logs
         ports:
-        - containerPort: 2181
-        resources: {}
-      restartPolicy: Always
-status: {}
+          - containerPort: 2181
+        imagePullPolicy: Never
