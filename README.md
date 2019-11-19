@@ -124,7 +124,7 @@ http POST :8080/messaging product=mocha name=flore
 
 The dashboard shows that the load is dispatched among the baristas.
 
-# Instructions to run in containers
+# Instructions to run containers using Docker
 
 1. Build Docker Images
    Use the following script to build the Docker images for the three microservices:
@@ -134,4 +134,36 @@ The dashboard shows that the load is dispatched among the baristas.
 1. Run Kafka and the microservices together using Docker Compose:
     ```bash
     docker-compose up
+    ```
+
+# Instructions to run containers using Kubernetes
+
+1. Build Docker Images
+    * Barista-Kafka
+    ```bash
+    docker build -f barista-kafka/Dockerfile . -t barista-kafka
+    ```
+    * Barista-HTTP
+    ```bash
+    docker build -f barista-http/Dockerfile . -t barista-http
+    ```
+    * Coffeeshop-Service
+    ```bash
+    docker build -f coffeeshop-service/Dockerfile . -t coffeeshop-service
+    ```
+1. Run zookeeper and kafka server
+    ```bash
+    kubectl apply -f zookeeper-deployment.yaml
+    kubectl apply -f zookeeper-service.yaml
+    kubectl apply -f kafka-deployment.yaml
+    kubectl apply -f kafka-service.yaml
+    ```
+1. Run services
+    ```bash
+    kubectl apply -f barista-kafka/deployment.yml
+    kubectl apply -f barista-kafka/service.yml
+    kubectl apply -f coffeeshop-service/deployment.yml
+    kubectl apply -f coffeeshop-service/service.yml
+    kubectl apply -f barista-http/deployment.yml
+    kubectl apply -f barista-http/service.yml
     ```
