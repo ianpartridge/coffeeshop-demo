@@ -175,3 +175,43 @@ The dashboard shows that the load is dispatched among the baristas.
     ```bash
     ./delete-kubernetes.sh
     ```
+
+# Instructions to run containers using Kubernetes and Strimzi operators
+
+1. Build docker images
+    ```bash
+    ./build.bat
+    ```
+    or 
+    ```bash
+    ./build.sh
+    ```
+1. Start Strimzi
+    ```bash
+    ./start-strimzi.bat
+    ```
+    or
+    ```bash
+    ./start-strimzi.sh
+    ```
+1. Run the kubernetes deployments and services
+    ```bash
+    ./apply-kubernetes.bat
+    ```
+    or
+    ```bash
+    ./apply-kubernetes.sh
+    ```
+1. Expose the coffeeshop-service to be accessible externally
+    ```bash
+    kubectl port-forward <COFFEESHOP POD> 8080:8080
+
+    ```
+1. Clean up kubernetes resource when done
+    ```bash
+    ./delete-kubernetes.bat
+    ```
+    or
+    ```bash
+    ./delete-kubernetes.sh
+    ```
