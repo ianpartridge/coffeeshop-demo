@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "baristaKafka.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+{{ include "coffeeshopChart.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.baristaKafka.replicaCount }}
+  selector:
+    matchLabels:
+      app: barista-kafka
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: barista-kafka
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: barista-kafka
+        image: "{{ .Values.baristaKafka.image.repository }}:{{ .Values.baristaKafka.image.version }}"
+        ports:
+          - containerPort: 8090
+        imagePullPolicy: {{ .Values.baristaKafka.image.pullPolicy }}
+        env:
+          - name: KAFKA_HOST
+            value: "{{ .Values.kafka.bootstrap.host }}:{{ .Values.kafka.bootstrap.port }}"
+        command: [ "java", "-Dkafka.bootstrap.servers=$(KAFKA_HOST)", "-jar", "app.jar" ]

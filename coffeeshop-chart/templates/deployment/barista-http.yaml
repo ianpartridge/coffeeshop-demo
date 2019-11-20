@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "baristaHttp.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+{{ include "coffeeshopChart.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.baristaHttp.replicaCount }}
+  selector:
+    matchLabels:
+      app: barista-http
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: barista-http
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: barista-http
+        image: "{{ .Values.baristaHttp.image.repository }}:{{ .Values.baristaHttp.image.version }}"
+        ports:
+          - containerPort: 8082
+        imagePullPolicy: {{ .Values.baristaHttp.image.pullPolicy }}

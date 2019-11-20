@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "coffeeshopService.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+{{ include "coffeeshopChart.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.coffeeshopService.replicaCount }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coffeeshop-service
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: coffeeshop-service
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: coffeeshop-service
+        image: "{{ .Values.coffeeshopService.image.repository }}:{{ .Values.coffeeshopService.image.version }}"
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+           httpGet:
+             path: /
+             port: 8080
+        readinessProbe:
+           httpGet:
+             path: /
+             port: 8080
+        imagePullPolicy: {{ .Values.coffeeshopService.image.pullPolicy }}
+        env:
+          - name: KAFKA_HOST
+            value: "{{ .Values.kafka.bootstrap.host }}:{{ .Values.kafka.bootstrap.port }}"
+          - name: BARISTA_HOST
+            value: "{{ include "baristaHttp.fullname" . }}:8082"
+        command: ["java", 
+          "-Dkafka.bootstrap.servers=$(KAFKA_HOST)", 
+          "-Dme.escoffier.quarkus.coffeeshop.http.BaristaService/mp-rest/url=http://$(BARISTA_HOST)", 
+          "-jar", 
+          "app.jar"
+        ]
