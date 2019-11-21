@@ -130,7 +130,7 @@
     });
 
     $(function () {
-        var source = new EventSource("http://localhost:8080/queue");
+        var source = new EventSource(window.location.protocol + "//" + window.location.host + "/queue");
         source.onmessage = function(e) {
             console.log(e);
             var state = JSON.parse(e.data);
