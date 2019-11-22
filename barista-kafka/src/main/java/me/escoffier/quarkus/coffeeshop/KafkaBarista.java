@@ -7,6 +7,8 @@ import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.inject.Inject;
+
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -16,6 +18,7 @@ import java.util.concurrent.Executors;
 @ApplicationScoped
 public class KafkaBarista {
 
+    @Inject
     @ConfigProperty(name = "barista.name")
     String name;
 
