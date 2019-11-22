@@ -2,33 +2,31 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
 baristaKafka: 
   replicaCount: 1
   image:
-    repository: barista-kafka
-    version: latest
+    repository: djones6/barista-kafka
+    version: 0.0.1
     pullPolicy: IfNotPresent
 
 baristaHttp:
   replicaCount: 1
   image:
-    repository: barista-http
-    version: latest
+    repository: djones6/barista-http
+    version: 0.0.1
     pullPolicy: IfNotPresent
 
 coffeeshopService:
   replicaCount: 1
   image:
-    repository: coffeeshop-service
-    version: latest
+    repository: djones6/coffeeshop-service
+    version: 0.0.1
     pullPolicy: IfNotPresent
 
-nameOverride: ""
-fullnameOverride: ""
-
+# The namespace that this chart's deployments should be installed into.
 namespace: coffeeshop-demo
 
+# The location of the Kafka bootstrap server.
 kafka:
   bootstrap:
     host: kafka-cluster-kafka-bootstrap
@@ -39,7 +37,7 @@ service:
   type: NodePort
 
 ingress:
-  enabled: true
+  enabled: false
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
