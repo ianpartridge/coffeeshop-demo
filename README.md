@@ -126,6 +126,9 @@ The dashboard shows that the load is dispatched among the baristas.
 
 # Instructions to run containers using Kubernetes, Strimzi operators and Keda
 
+Pre-requisite:
+* Clone the Keda GitHub Repository to the same directory as this project. The `start-keda` script relies on this to run the relevant commands.
+
 1. Build Docker Images
    Use the following script to build the Docker images for the three microservices:
     ```bash
