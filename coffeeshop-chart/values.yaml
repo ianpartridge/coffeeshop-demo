@@ -23,13 +23,12 @@ coffeeshopService:
     version: 0.0.1
     pullPolicy: IfNotPresent
 
-# The namespace that this chart's deployments should be installed into.
-namespace: coffeeshop-demo
-
-# The location of the Kafka bootstrap server.
+# The namespace and service name for the Kafka server.
 kafka:
+  namespace: kafka
+  cluster: my-cluster
   bootstrap:
-    host: kafka-cluster-kafka-bootstrap
+    service: my-cluster-kafka-bootstrap
     port: 9092
 
 # The type of service port defined for the coffeeshop service.

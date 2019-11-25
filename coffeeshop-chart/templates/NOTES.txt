@@ -4,16 +4,16 @@
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ . }}{{ $.Values.ingress.path }}
 {{- end }}
 {{- else if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "coffeeshopService.fullname" . }} --namespace {{ .Values.namespace }})
+  export NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "coffeeshopService.fullname" . }} --namespace {{ .Release.Namespace }})
   export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[1].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type }}
      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch the status of by running 'kubectl get svc -w {{ template "coffeeshopService.fullname" . }} --namespace {{ .Values.namespace }}'
-  export SERVICE_IP=$(kubectl get svc {{ template "coffeeshopService.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}' --namespace {{ .Values.namespace }})
+           You can watch the status of by running 'kubectl get svc -w {{ template "coffeeshopService.fullname" . }} --namespace {{ .Release.Namespace }}'
+  export SERVICE_IP=$(kubectl get svc {{ template "coffeeshopService.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}' --namespace {{ .Release.Namespace }})
   echo http://$SERVICE_IP:8080
 {{- else if contains "ClusterIP" .Values.service.type }}
-  export POD_NAME=$(kubectl get pods -l "app=coffeeshop-service,release={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}" --namespace {{ .Values.namespace }})
+  export POD_NAME=$(kubectl get pods -l "app=coffeeshop-service,release={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}" --namespace {{ .Release.Namespace }})
   echo "Visit http://localhost:8080 to use your application"
-  kubectl port-forward $POD_NAME 8080:8080 --namespace {{ .Values.namespace }}
+  kubectl port-forward $POD_NAME 8080:8080 --namespace {{ .Release.Namespace }}
 {{- end }}

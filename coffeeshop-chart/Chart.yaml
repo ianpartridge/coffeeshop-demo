@@ -2,6 +2,19 @@ apiVersion: v2
 name: coffeeshop-chart
 description: A Helm chart for Kubernetes
 
+dependencies:
+# TODO: At the moment we have to install strimzi as a separate step, as the helm chart
+# has not yet been updated for Helm 3, and uses a deprecated method of installing CRDs.
+#  - name: nginx-ingress
+#    version: 1.25.0
+#    repository: https://kubernetes-charts.storage.googleapis.com/
+#  - name: keda
+#    version: 1.0.0
+#    repository: https://kedacore.github.io/charts/
+#  - name: strimzi-kafka-operator
+#    version: 0.14.0
+#    repository: https://strimzi.io/charts/
+
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
@@ -14,7 +27,7 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.1.1
+version: 0.1.2
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "coffeeshopService.fullname" . }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
 {{ include "coffeeshopChart.labels" . | indent 4 }}
 spec:
@@ -34,7 +34,7 @@ spec:
         imagePullPolicy: {{ .Values.coffeeshopService.image.pullPolicy }}
         env:
           - name: KAFKA_HOST
-            value: "{{ .Values.kafka.bootstrap.host }}:{{ .Values.kafka.bootstrap.port }}"
+            value: "{{ .Values.kafka.bootstrap.service }}.{{ .Values.kafka.namespace }}:{{ .Values.kafka.bootstrap.port }}"
           - name: BARISTA_HOST
             value: "{{ include "baristaHttp.fullname" . }}:8082"
         command: ["java", 

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "baristaKafka.fullname" . }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
 {{ include "coffeeshopChart.labels" . | indent 4 }}
 spec:
@@ -25,5 +25,5 @@ spec:
         imagePullPolicy: {{ .Values.baristaKafka.image.pullPolicy }}
         env:
           - name: KAFKA_HOST
-            value: "{{ .Values.kafka.bootstrap.host }}:{{ .Values.kafka.bootstrap.port }}"
+            value: "{{ .Values.kafka.bootstrap.service }}.{{ .Values.kafka.namespace }}:{{ .Values.kafka.bootstrap.port }}"
         command: [ "java", "-Dkafka.bootstrap.servers=$(KAFKA_HOST)", "-jar", "app.jar" ]
