@@ -24,4 +24,4 @@ spec:
             value: /tmp/logs
         ports:
           - containerPort: 2181
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent

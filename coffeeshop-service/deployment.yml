@@ -17,4 +17,4 @@ spec:
         image: coffeeshop-service
         ports:
           - containerPort: 8080
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent

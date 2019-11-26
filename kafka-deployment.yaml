@@ -36,4 +36,4 @@ spec:
         ports:
           - containerPort: 9092
           - containerPort: 9093
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent

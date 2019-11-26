@@ -17,4 +17,4 @@ spec:
         image: barista-kafka
         ports:
           - containerPort: 8090
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent

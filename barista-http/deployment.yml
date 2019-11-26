@@ -17,4 +17,4 @@ spec:
         image: barista-http
         ports:
           - containerPort: 8082
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
