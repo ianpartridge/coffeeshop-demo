@@ -1,0 +1,11 @@
+services:
+  - docker
+
+os: linux
+
+script:
+  - ./build.sh
+  - docker-compose run ready
+  - ./ci-test.sh
+  - docker-compose down
+

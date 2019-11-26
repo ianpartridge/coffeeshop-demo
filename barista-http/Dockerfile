@@ -12,13 +12,13 @@ COPY barista-http/pom.xml /project/barista-http/pom.xml
 COPY pom.xml /project/
 
 # Download dependencies
-RUN mvn -f barista-http/pom.xml clean dependency:resolve
+RUN mvn -q -f barista-http/pom.xml clean dependency:resolve
 
 # Copy application sources
 COPY barista-http/src /project/barista-http/src
 
 # Build and package
-RUN mvn -f barista-http/pom.xml package
+RUN mvn -q -f barista-http/pom.xml package
 
 # Start with OL runtime.
 FROM open-liberty
