@@ -66,7 +66,22 @@ services:
       depends_on:
           - kafka
           - barista-http
+          - barista-kafka
       ports:
           - "8080:8080"
       expose:
           - "8080"
+
+  ready:
+      image: adoptopenjdk/openjdk8-openj9:x86_64-ubi-minimal-jre8u232-b09_openj9-0.17.0
+      depends_on:
+          - coffeeshop-service
+      command: >
+        /bin/bash -c "
+          while ! curl -sI http://coffeeshop-service:8080;
+          do
+            echo sleeping;
+            sleep 1;
+          done;
+          echo Connected!;
+        "
