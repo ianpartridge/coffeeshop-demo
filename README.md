@@ -126,33 +126,12 @@ The dashboard shows that the load is dispatched among the baristas.
 
 # Instructions to run in containers
 
-1. Run Kafka
+1. Build Docker Images
+   Use the following script to build the Docker images for the three microservices:
+    ```bash
+    ./build.sh
+    ```
+1. Run Kafka and the microservices together using Docker Compose:
     ```bash
     docker-compose up
-    ```
-1. Build Docker Images
-    * Barista-Kafka
-    ```bash
-    docker build -f barista-kafka/Dockerfile . -t barista-kafka
-    ```
-    * Barista-HTTP
-    ```bash
-    docker build -f barista-http/Dockerfile . -t barista-http
-    ```
-    * Coffeeshop-Service
-    ```bash
-    docker build -f coffeeshop-service/Dockerfile . -t coffeeshop-service
-    ```
-1. Run Docker Images
-    * Barista-Kafka
-    ```bash
-    docker run -i --rm -p 8090:8090 --name barista-kafka_1 --network quarkus-coffeeshop-demo_default barista-kafka
-    ```
-    * Barista-HTTP
-    ```bash
-    docker run -i --rm -p 8082:8082 --name barista-http_1 --network quarkus-coffeeshop-demo_default barista-http
-    ```
-    * Coffeeshop-Service
-    ```bash
-    docker run -i --rm -p 8080:8080 --name coffeeshop-service_1 --network quarkus-coffeeshop-demo_default coffeeshop-service
     ```
