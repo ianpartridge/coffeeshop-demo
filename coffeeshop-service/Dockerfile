@@ -12,13 +12,13 @@ COPY coffeeshop-service/pom.xml /project/coffeeshop-service/pom.xml
 COPY pom.xml /project/
 
 # Download dependencies
-RUN mvn -f coffeeshop-service/pom.xml clean dependency:resolve
+RUN mvn -q -f coffeeshop-service/pom.xml clean dependency:resolve
 
 # Copy application sources
 COPY coffeeshop-service/src /project/coffeeshop-service/src
 
 # Build and package
-RUN mvn -f coffeeshop-service/pom.xml package
+RUN mvn -q -f coffeeshop-service/pom.xml package
 
 ## Create Image
 FROM adoptopenjdk/openjdk8-openj9:x86_64-ubi-minimal-jre8u232-b09_openj9-0.17.0

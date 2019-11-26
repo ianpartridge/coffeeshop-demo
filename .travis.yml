@@ -6,9 +6,6 @@ os: linux
 script:
   - ./build.sh
   - docker-compose run ready
-  - curl -LO https://www-us.apache.org/dist/kafka/2.3.1/kafka_2.12-2.3.1.tgz && tar -xf kafka_2.12-2.3.1.tgz && export PATH=$PWD/kafka_2.12-2.3.1/bin:$PATH
-  - kafka-topics.sh --bootstrap-server localhost:9092 --create --partitions 4 --replication-factor 1 --topic orders
-  - kafka-topics.sh --bootstrap-server localhost:9092 --list
   - ./ci-test.sh
   - docker-compose down
 

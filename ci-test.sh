@@ -3,7 +3,7 @@
 set -ex
 
 # Test POSTing an order
-response=`curl -d"{\"name\":\"Travis\",\"product\":\"frappuccino\"}" -H "Content-Type: application/json" http://localhost:8080/messaging`
+response=`curl -s -d"{\"name\":\"Travis\",\"product\":\"frappuccino\"}" -H "Content-Type: application/json" http://localhost:8080/messaging`
 responseRegex='orderId" *: *"[a-z0-9-]+"'
 
 if [[ "$response" =~ $responseRegex ]]; then
