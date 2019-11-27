@@ -50,9 +50,6 @@ services:
 
   barista-http:
       image: barista-http
-      command: [
-          "java", "-jar", "app.jar"
-      ]
       ports:
           - "8082:8082"
 
