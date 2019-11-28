@@ -25,6 +25,7 @@ FROM open-liberty
 
 COPY --from=build --chown=1001:0 /project/barista-kafka/target/barista-kafka-1.0-SNAPSHOT.war /opt/ol/wlp/usr/servers/defaultServer/apps
 COPY --from=build --chown=1001:0 /project/barista-kafka/src/main/liberty/config/server.xml /opt/ol/wlp/usr/servers/defaultServer
+COPY barista-kafka/barista-name.sh /tmp
 
 EXPOSE 8090
 
