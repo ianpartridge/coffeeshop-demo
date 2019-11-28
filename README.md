@@ -215,3 +215,38 @@ The dashboard shows that the load is dispatched among the baristas.
     ```bash
     ./delete-kubernetes.sh
     ```
+
+# Helm (v3)
+
+Note: current problems: Although Strimzi's kafkatopics resource creates the 'orders' topic with multiple partitions, the partition count then seems to get reset to 1, which means Keda can't scale the barista. As a workaround, changing the partition count and then upgrading the chart seems to resolve this (usually).
+
+### Installing
+1. Install Strimzi
+```
+kubectl create ns strimzi
+kubectl create ns kafka
+helm repo add strimzi https://strimzi.io/charts
+helm install strimzi strimzi/strimzi-kafka-operator -n strimzi --set watchNamespaces={kafka}
+```
+2. Install coffeeshop chart
+```
+kubectl create ns coffee
+cd coffeeshop-chart
+helm dependency update
+helm install coffee-v1 . -n coffee
+```
+
+### Upgrades
+Eg. if you have changed something in the chart:
+```
+helm upgrade coffee-v1 . -n coffee
+```
+
+### Removal
+Eg. if you want to clear out everything that was created by the chart:
+```
+helm uninstall coffee-v1 -n coffee
+kubectl delete kafkatopics -n kafka --all
+kubectl delete hpa -n coffee --all
+kubectl delete scaledobjects -n coffee --all
+```
