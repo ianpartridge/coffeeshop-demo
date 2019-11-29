@@ -19,12 +19,13 @@ script:
   - ./.ci/local-registry.sh
     # Update deployments to reference the local registry
   - ./.ci/replace-refs.sh
-    # Deploy to local cluster
-  - kubectl create ns coffeeshop-demo
-  - ./apply-kubernetes.sh
+    # Install kafka via Strimzi
+  - ./start-strimzi.sh
     # Wait for kafka to be ready
-  - export PODNAME=`kubectl get pod -l app=kafka -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
-  - kubectl wait --for=condition=Ready pod -l app=kafka -n coffeeshop-demo --timeout=180s || kubectl logs $PODNAME -n coffeeshop-demo
+  - export PODNAME=`kubectl get pod -l app=kafka -o jsonpath="{.items[0].metadata.name}" -n kafka`
+  - kubectl wait --for=condition=Ready pod -l app=kafka -n kafka --timeout=180s || kubectl logs $PODNAME -n kafka
+    # Deploy to local cluster
+  - ./apply-kubernetes.sh
     # Wait for all pods to be ready
   - export PODNAME=`kubectl get pod -l app=barista-kafka -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
   - kubectl wait --for=condition=Ready pod -l app=barista-kafka -n coffeeshop-demo --timeout=120s || kubectl logs $PODNAME -n coffeeshop-demo
