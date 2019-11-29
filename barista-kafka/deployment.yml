@@ -25,3 +25,8 @@ spec:
           httpGet:
             path: /health/ready
             port: 8090
+        command: ["/opt/ol/wlp/bin/server",
+          "run",
+          "defaultServer",
+          "-Dmp.messaging.connector.liberty-kafka.bootstrap.servers=kafka:9093"
+        ]
