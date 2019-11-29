@@ -22,10 +22,13 @@ script:
     # Deploy to local cluster
   - kubectl create ns coffeeshop-demo
   - ./apply-kubernetes.sh
+    # Wait for kafka to be ready
+  - kubectl wait --for=condition=Ready pod -l app=kafka -n coffeeshop-demo --timeout=180s
     # Wait for coffeeshop-service to be ready
-  - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo
+  - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo --timeout=180s
+    # Debugging...
+  - kubectl get all -n coffeeshop-demo
     # Forward local port
   - kubectl port-forward service/coffeeshop-service 8080:8080 -n coffeeshop-demo &
-    # Test system
+    # Wait for port forwarding, test system
   - sleep 5 && ./ci-test.sh
-
