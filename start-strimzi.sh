@@ -1,8 +1,4 @@
 #!/bin/sh
 kubectl create ns kafka
-kubectl create ns coffeeshop-demo
-kubectl apply -f strimzi-0.14.0/cluster-operator/ -n kafka
-kubectl apply -f strimzi-0.14.0/cluster-operator/020-RoleBinding-strimzi-cluster-operator.yaml -n coffeeshop-demo
-kubectl apply -f strimzi-0.14.0/cluster-operator/032-RoleBinding-strimzi-cluster-operator-topic-operator-delegation.yaml -n coffeeshop-demo
-kubectl apply -f strimzi-0.14.0/cluster-operator/031-RoleBinding-strimzi-cluster-operator-entity-operator-delegation.yaml -n coffeeshop-demo
-kubectl apply -f kafka-strimzi.yml -n coffeeshop-demo
+curl -L https://github.com/strimzi/strimzi-kafka-operator/releases/download/0.14.0/strimzi-cluster-operator-0.14.0.yaml | sed 's/namespace: .*/namespace: kafka/' | kubectl apply -f - -n kafka
+kubectl apply -f kafka-strimzi.yml -n kafka

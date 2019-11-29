@@ -30,5 +30,5 @@ spec:
         command: ["/opt/ol/wlp/bin/server",
           "run",
           "defaultServer",
-          "-Dmp.messaging.connector.liberty-kafka.bootstrap.servers=kafka:9093"
+          "-Dmp.messaging.connector.liberty-kafka.bootstrap.servers=kafka-cluster-kafka-bootstrap.kafka:9092"
         ]
