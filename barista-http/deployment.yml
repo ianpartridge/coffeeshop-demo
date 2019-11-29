@@ -18,3 +18,10 @@ spec:
         ports:
           - containerPort: 8082
         imagePullPolicy: IfNotPresent
+        livenessProbe:
+          tcpSocket:
+            port: 8082
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8082

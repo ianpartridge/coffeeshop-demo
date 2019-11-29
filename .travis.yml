@@ -24,7 +24,9 @@ script:
   - ./apply-kubernetes.sh
     # Wait for kafka to be ready
   - kubectl wait --for=condition=Ready pod -l app=kafka -n coffeeshop-demo --timeout=180s
-    # Wait for coffeeshop-service to be ready
+    # Wait for all pods to be ready
+  - kubectl wait --for=condition=Ready pod -l app=barista-kafka -n coffeeshop-demo --timeout=180s
+  - kubectl wait --for=condition=Ready pod -l app=barista-http -n coffeeshop-demo --timeout=180s
   - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo --timeout=180s
     # Debugging...
   - kubectl get all -n coffeeshop-demo

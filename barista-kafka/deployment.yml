@@ -18,3 +18,10 @@ spec:
         ports:
           - containerPort: 8090
         imagePullPolicy: IfNotPresent
+        livenessProbe:
+          tcpSocket:
+            port: 8090
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8090
