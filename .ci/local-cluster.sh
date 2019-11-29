@@ -1,4 +1,11 @@
 #!/bin/sh
+#
+# Set up a local kind cluster connected to a local docker registry.
+# This enables us to access images that we have built locally from
+# our kind cluster.
+#
+# See: https://kind.sigs.k8s.io/docs/user/local-registry/
+#
 set -o errexit
 
 # create registry container unless it already exists 

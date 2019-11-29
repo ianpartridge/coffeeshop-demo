@@ -16,14 +16,29 @@ else
   false
 fi
 
-# Test order completion. Wait for 6 seconds for a response in the stream
-# (it should only take around 5 seconds for barista-kafka to respond, but
-# may take longer in a CI environment)
-eventStream=`curl -s --max-time 6 http://localhost:${SERVICE_PORT}/queue | grep 'data'`
+# Test order completion. Wait for up to 30 seconds for a response in the stream
+# (it should only take around 5 seconds for barista-kafka to respond, but may
+# take longer in a CI environment)
+timeout=30
+
+# Stream output from the queue to a temporary file
+echo "" > tmp.out
+curl -s --no-buffer http://localhost:${SERVICE_PORT}/queue > tmp.out &
+curlpid=$!
+
+# Poll the temporary file, looking for a line containing the expected response
+for i in `seq 1 ${timeout}`; do
+  eventStream=`grep "READY" tmp.out` && break || sleep 1
+done
+
+# Kill the stream
+kill $curlpid
+
+# Check that the response contains the expected output
 responseRegex='"state" *: *"READY"'
 
 if [[ "$eventStream" =~ $responseRegex ]]; then
-  echo "Order was successfully processed"
+  echo "Order was successfully processed after $i seconds"
 else
   echo "Order completion not detected"
   false

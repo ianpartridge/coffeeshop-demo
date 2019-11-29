@@ -21,6 +21,8 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8090
+          periodSeconds: 10
+          failureThreshold: 10
         readinessProbe:
           httpGet:
             path: /health/ready

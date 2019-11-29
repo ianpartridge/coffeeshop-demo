@@ -23,12 +23,16 @@ script:
   - kubectl create ns coffeeshop-demo
   - ./apply-kubernetes.sh
     # Wait for kafka to be ready
-  - kubectl wait --for=condition=Ready pod -l app=kafka -n coffeeshop-demo --timeout=180s
+  - export PODNAME=`kubectl get pod -l app=kafka -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
+  - kubectl wait --for=condition=Ready pod -l app=kafka -n coffeeshop-demo --timeout=180s || kubectl logs $PODNAME -n coffeeshop-demo
     # Wait for all pods to be ready
-  - kubectl wait --for=condition=Ready pod -l app=barista-kafka -n coffeeshop-demo --timeout=180s
-  - kubectl wait --for=condition=Ready pod -l app=barista-http -n coffeeshop-demo --timeout=180s
-  - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo --timeout=180s
-    # Debugging...
+  - export PODNAME=`kubectl get pod -l app=barista-kafka -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
+  - kubectl wait --for=condition=Ready pod -l app=barista-kafka -n coffeeshop-demo --timeout=120s || kubectl logs $PODNAME -n coffeeshop-demo
+  - export PODNAME=`kubectl get pod -l app=barista-http -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
+  - kubectl wait --for=condition=Ready pod -l app=barista-http -n coffeeshop-demo --timeout=120s || kubectl logs $PODNAME -n coffeeshop-demo
+  - export PODNAME=`kubectl get pod -l app=coffeeshop-service -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
+  - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo --timeout=120s || kubectl logs $PODNAME -n coffeeshop-demo
+    # Display overall system state
   - kubectl get all -n coffeeshop-demo
     # Forward local port
   - kubectl port-forward service/coffeeshop-service 8080:8080 -n coffeeshop-demo &
