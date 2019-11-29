@@ -24,13 +24,14 @@ spec:
         ports:
           - containerPort: 8080
         livenessProbe:
-           httpGet:
-             path: /
-             port: 8080
+          tcpSocket:
+            port: 8080
+          periodSeconds: 10
+          failureThreshold: 10
         readinessProbe:
-           httpGet:
-             path: /
-             port: 8080
+          httpGet:
+            path: /
+            port: 8080
         imagePullPolicy: {{ .Values.coffeeshopService.image.pullPolicy }}
         env:
           - name: KAFKA_HOST

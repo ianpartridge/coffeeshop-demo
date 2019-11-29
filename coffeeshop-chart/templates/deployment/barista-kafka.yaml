@@ -23,6 +23,15 @@ spec:
         ports:
           - containerPort: 8090
         imagePullPolicy: {{ .Values.baristaKafka.image.pullPolicy }}
+        livenessProbe:
+          tcpSocket:
+            port: 8090
+          periodSeconds: 10
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8090
         env:
           - name: KAFKA_HOST
             value: "{{ .Values.kafka.bootstrap.service }}.{{ .Values.kafka.namespace }}:{{ .Values.kafka.bootstrap.port }}"
