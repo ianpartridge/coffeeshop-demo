@@ -27,9 +27,11 @@ curl -s --no-buffer http://localhost:${SERVICE_PORT}/queue > tmp.out &
 curlpid=$!
 
 # Poll the temporary file, looking for a line containing the expected response
+set +x
 for i in `seq 1 ${timeout}`; do
   eventStream=`grep "READY" tmp.out` && break || sleep 1
 done
+set -x
 
 # Kill the stream
 kill $curlpid
