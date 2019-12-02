@@ -21,9 +21,16 @@ script:
   - ./.ci/local-registry.sh
     # Update deployments to reference the local registry
   - ./.ci/replace-refs.sh
-    # Install kafka via Strimzi (prereq for our helm chart, but CRDs must be installed first)
-  - ./start-strimzi.sh
-    # Deploy to local cluster via helm
+    # Install kafka via Strimzi helm chart, placing Strimzi operator in strimzi
+    # namespace, and watching the kafka namespace.
+    # (Cannot be expressed as a helm dependency, as CRDs must be installed first)
+  - kubectl create ns strimzi
+  - kubectl create ns kafka
+  - helm repo add strimzi https://strimzi.io/charts
+  - helm install strimzi strimzi/strimzi-kafka-operator -n strimzi --set watchNamespaces={kafka} --wait --timeout 300s
+    # Deploy to local cluster via helm, into coffee namespace. Chart defaults to
+    # installing kafka cluster into kafka namespace.
+  - kubectl create ns coffee
   - helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s
     # Display overall system state for kafka and coffee namespaces
   - kubectl get all -n kafka
