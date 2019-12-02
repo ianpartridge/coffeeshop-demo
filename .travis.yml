@@ -21,9 +21,21 @@ script:
   - ./.ci/replace-refs.sh
     # Install kafka via Strimzi
   - ./start-strimzi.sh
-    # Wait for kafka to be ready
-  - export PODNAME=`kubectl get pod -l app=kafka -o jsonpath="{.items[0].metadata.name}" -n kafka`
-  - kubectl wait --for=condition=Ready pod -l app=kafka -n kafka --timeout=180s || kubectl logs $PODNAME -n kafka
+    # Strimzi Operator will create a zookeeper and kafka cluster from our CR manifest.
+    # We need to wait for each of the components to be ready (in the right order) before
+    # continuing to deploy our app. Wait for the operator itself, then zookeeper, and 
+    # finally kafka (which won't be created until zookeeper is ready).
+    # 1. Wait for strimzi operator to be ready
+  - export PODNAME=`kubectl get pod -l name=strimzi-cluster-operator -o jsonpath="{.items[0].metadata.name}" -n kafka` && echo $PODNAME
+  - kubectl wait --for=condition=Ready pod $PODNAME -n kafka --timeout=180s || kubectl logs $PODNAME -n kafka
+    # 2. Wait for zookeeper to be ready
+  - export PODNAME=`kubectl get pod -l strimzi.io/name=kafka-cluster-zookeeper -o jsonpath="{.items[0].metadata.name}" -n kafka` && echo $PODNAME
+  - kubectl wait --for=condition=Ready pod $PODNAME -n kafka --timeout=180s || kubectl logs $PODNAME -n kafka
+    # 3. Wait for kafka to be ready
+  - export PODNAME=`kubectl get pod -l strimzi.io/name=kafka-cluster-kafka -o jsonpath="{.items[0].metadata.name}" -n kafka` && echo $PODNAME
+  - kubectl wait --for=condition=Ready pod $PODNAME -n kafka --timeout=180s || kubectl logs $PODNAME -n kafka
+    # 4. Display overall system state for kafka namespace
+  - kubectl get all -n kafka
     # Deploy to local cluster
   - ./apply-kubernetes.sh
     # Wait for all pods to be ready
