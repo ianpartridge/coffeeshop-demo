@@ -9,6 +9,8 @@ install:
   - curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.6.0/kind-$(uname)-amd64 && chmod +x ./kind && mv ./kind ~/bin
     # Install kubectl
   - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && chmod +x ./kubectl && mv ./kubectl ~/bin
+    # Install helm
+  - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
 script:
     # Build docker images for the services
@@ -19,22 +21,13 @@ script:
   - ./.ci/local-registry.sh
     # Update deployments to reference the local registry
   - ./.ci/replace-refs.sh
-    # Install kafka via Strimzi
+    # Install kafka via Strimzi (prereq for our helm chart, but CRDs must be installed first)
   - ./start-strimzi.sh
-    # Wait for strimzi custom resource to be ready (this will be ready once the
-    # zookeeper and kafka cluster have been created and are ready)
-  - kubectl wait --for=condition=Ready kafkas/kafka-cluster -n kafka --timeout=180s || kubectl logs deployment/strimzi-cluster-operator -n kafka
-    # 4. Display overall system state for kafka namespace
+    # Deploy to local cluster via helm
+  - helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s
+    # Display overall system state for kafka and coffee namespaces
   - kubectl get all -n kafka
-    # Deploy to local cluster
-  - ./apply-kubernetes.sh
-    # Wait for all pods to be ready
-  - kubectl wait --for=condition=Ready pod -l app=barista-kafka -n coffeeshop-demo --timeout=180s || kubectl logs deployment/barista-kafka -n coffeeshop-demo
-  - kubectl wait --for=condition=Ready pod -l app=barista-http -n coffeeshop-demo --timeout=180s || kubectl logs deployment/barista-http -n coffeeshop-demo
-  - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo --timeout=180s || kubectl logs deployment/coffeeshop-service -n coffeeshop-demo
-    # Display overall system state
-  - kubectl get all -n coffeeshop-demo
-    # Forward local port
-  - kubectl port-forward service/coffeeshop-service 8080:8080 -n coffeeshop-demo &
-    # Wait for port forwarding, test system
-  - sleep 5 && ./ci-test.sh
+  - kubectl get all -n coffee
+    # Test system
+  - export NODE_PORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services coffee-v1-coffeeshop-service --namespace coffee)
+  - ./ci-test.sh $NODE_PORT
