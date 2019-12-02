@@ -16,10 +16,10 @@ else
   false
 fi
 
-# Test order completion. Wait for up to 30 seconds for a response in the stream
+# Test order completion. Wait for up to 60 seconds for a response in the stream
 # (it should only take around 5 seconds for barista-kafka to respond, but may
-# take longer in a CI environment)
-timeout=30
+# take much longer in a CI environment)
+timeout=60
 
 # Stream output from the queue to a temporary file
 echo "" > tmp.out
