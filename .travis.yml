@@ -23,19 +23,15 @@ script:
   - ./start-strimzi.sh
     # Wait for strimzi custom resource to be ready (this will be ready once the
     # zookeeper and kafka cluster have been created and are ready)
-  - export OPERATOR=`kubectl get pod -l name=strimzi-cluster-operator -o jsonpath="{.items[0].metadata.name}" -n kafka` && echo $OPERATOR
-  - kubectl wait --for=condition=Ready kafkas/kafka-cluster -n kafka --timeout=180s || kubectl logs $OPERATOR -n kafka
+  - kubectl wait --for=condition=Ready kafkas/kafka-cluster -n kafka --timeout=180s || kubectl logs deployment/strimzi-cluster-operator -n kafka
     # 4. Display overall system state for kafka namespace
   - kubectl get all -n kafka
     # Deploy to local cluster
   - ./apply-kubernetes.sh
     # Wait for all pods to be ready
-  - export PODNAME=`kubectl get pod -l app=barista-kafka -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
-  - kubectl wait --for=condition=Ready pod -l app=barista-kafka -n coffeeshop-demo --timeout=180s || kubectl logs $PODNAME -n coffeeshop-demo
-  - export PODNAME=`kubectl get pod -l app=barista-http -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
-  - kubectl wait --for=condition=Ready pod -l app=barista-http -n coffeeshop-demo --timeout=180s || kubectl logs $PODNAME -n coffeeshop-demo
-  - export PODNAME=`kubectl get pod -l app=coffeeshop-service -o jsonpath="{.items[0].metadata.name}" -n coffeeshop-demo`
-  - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo --timeout=180s || kubectl logs $PODNAME -n coffeeshop-demo
+  - kubectl wait --for=condition=Ready pod -l app=barista-kafka -n coffeeshop-demo --timeout=180s || kubectl logs deployment/barista-kafka -n coffeeshop-demo
+  - kubectl wait --for=condition=Ready pod -l app=barista-http -n coffeeshop-demo --timeout=180s || kubectl logs deployment/barista-http -n coffeeshop-demo
+  - kubectl wait --for=condition=Ready pod -l app=coffeeshop-service -n coffeeshop-demo --timeout=180s || kubectl logs deployment/coffeeshop-service -n coffeeshop-demo
     # Display overall system state
   - kubectl get all -n coffeeshop-demo
     # Forward local port
