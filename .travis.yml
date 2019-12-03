@@ -28,8 +28,10 @@ script:
   - kubectl create ns kafka
   - helm repo add strimzi https://strimzi.io/charts
   - helm install strimzi strimzi/strimzi-kafka-operator -n strimzi --set watchNamespaces={kafka} --wait --timeout 300s
-    # Deploy to local cluster via helm, into coffee namespace. Chart defaults to
-    # installing kafka cluster into kafka namespace.
+    # Install Strimzi custom resource, and wait for cluster creation
+  - kubectl apply -f kafka-strimzi.yml -n kafka
+  - kubectl wait --for=condition=Ready kafkas/my-cluster -n kafka --timeout 300s
+    # Deploy to local cluster via helm, into coffee namespace.
   - kubectl create ns coffee
   - helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s --set baristaKafka.image.repository=registry:5000/barista-kafka --set baristaHttp.image.repository=registry:5000/barista-http --set coffeeshopService.image.repository=registry:5000/coffeeshop-service
     # Display overall system state for kafka and coffee namespaces
