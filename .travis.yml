@@ -31,7 +31,7 @@ script:
     # Deploy to local cluster via helm, into coffee namespace. Chart defaults to
     # installing kafka cluster into kafka namespace.
   - kubectl create ns coffee
-  - helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s
+  - helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s --set baristaKafka.image.repository=registry:5000/barista-kafka --set baristaHttp.image.repository=registry:5000/barista-http --set coffeeshopService.image.repository=registry:5000/coffeeshop-service
     # Display overall system state for kafka and coffee namespaces
   - kubectl get all -n kafka
   - kubectl get all -n coffee
