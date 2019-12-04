@@ -124,88 +124,90 @@ http POST :8080/messaging product=mocha name=flore
 
 The dashboard shows that the load is dispatched among the baristas.
 
-# Instructions to run containers using Kubernetes, Strimzi operators and Keda
+# Run locally in containers using Docker Compose
 
-Pre-requisite:
-* Clone the Keda GitHub Repository to the same directory as this project. The `start-keda` script relies on this to run the relevant commands.
+To perform a simple local run of the demo, use:
+```
+docker-compose up
+```
+...wait until the 'ready' stage completes (with the message `coffeeshop-service is ready!`), then order coffees at http://localhost:8080/
 
-1. Build Docker Images
-   Use the following script to build the Docker images for the three microservices:
-    ```bash
-    ./build.bat
-    ```
-    or 
-    ```bash
-    ./build.sh
-    ```
-1. Start Strimzi
-    ```bash
-    ./start-strimzi.bat
-    ```
-    or
-    ```bash
-    ./start-strimzi.sh
-    ```
-1. Run the kubernetes deployments and services
-    ```bash
-    ./apply-kubernetes.bat
-    ```
-    or
-    ```bash
-    ./apply-kubernetes.sh
-    ```
-1. Start Keda
-    ```bash
-    ./start-keda.bat
-    ```
-    or
-    ```bash
-    ./start-keda.sh
-    ```
-1. Expose the coffeeshop-service to be accessible externally
-    ```bash
-    kubectl port-forward service/coffeeshop-service 8080:8080 -n coffeeshop-demo
-    ```
-1. Clean up kubernetes resource when done
-    ```bash
-    ./delete-kubernetes.bat
-    ```
-    or
-    ```bash
-    ./delete-kubernetes.sh
-    ```
+# Run with Strimzi and Keda, using Helm
 
-# Helm (v3)
+The Coffeeshop demo and its prerequisites can be installed into a Kubernetes cluster using Helm (v3).
 
-Note: current problems: Although Strimzi's kafkatopics resource creates the 'orders' topic with multiple partitions, the partition count then seems to get reset to 1, which means Keda can't scale the barista. As a workaround, changing the partition count and then upgrading the chart seems to resolve this (usually).
+### Prereqs
+
+- Install Helm v3: https://helm.sh/docs/intro/install/
+- Ensure you have a Kubernetes cluster. For running locally, you could use:
+  - [Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/kubernetes/) or [Mac](https://docs.docker.com/docker-for-mac/kubernetes/),
+  - [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/), or 
+  - [kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
+  - _Kind is nice because it's quick and easy to create / teardown a temporary cluster, but there are a couple of additional steps required if you want to use it. Take a look at the Travis job (which uses kind) for details._
 
 ### Installing
+
+You can install everything using Helm by running the supplied `install.sh` (or `install.bat`) script.  Removal can be performed with `uninstall.sh` / `uninstall.bat`.
+
+To install manually, the steps are:
+
 1. Install Strimzi
-```
+```bash
 kubectl create ns strimzi
 kubectl create ns kafka
 helm repo add strimzi https://strimzi.io/charts
-helm install strimzi strimzi/strimzi-kafka-operator -n strimzi --set watchNamespaces={kafka}
+helm install strimzi strimzi/strimzi-kafka-operator -n strimzi --set watchNamespaces={kafka} --wait --timeout 300s
 ```
-2. Install coffeeshop chart
+1. Install the custom resource to create a Kafka
+```bash
+kubectl apply -f kafka-strimzi.yml -n kafka
+kubectl wait --for=condition=Ready kafkas/my-cluster -n kafka --timeout 180s
 ```
+1. Install coffeeshop chart
+```bash
 kubectl create ns coffee
-cd coffeeshop-chart
-helm dependency update
-helm install coffee-v1 . -n coffee
+helm dependency update ./coffeeshop-chart
+helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s
 ```
 
-### Upgrades
-Eg. if you have changed something in the chart:
+Once installed, you can access the service either using the NodePort, or you can set up port forwarding:
+```bash
+kubectl port-forward service/coffee-v1-coffeeshop-service 8080:8080 -n coffee
 ```
-helm upgrade coffee-v1 . -n coffee
+
+### Validating
+
+You can validate that the install is successful using the `ci-test.sh` script (that is used by the Travis job):
+```bash
+./ci-test.sh 8080 coffee
+```
+- if using the NodePort, substitute the port number instead of 8080 above.
+
+### Upgrades
+
+If you have changed something in the chart:
+```bash
+helm upgrade coffee-v1 ./coffeeshop-chart -n coffee
 ```
 
 ### Removal
-Eg. if you want to clear out everything that was created by the chart:
-```
+
+If you want to clear out everything that was created by the chart, either use the `uninstall.sh`, or:
+
+```bash
 helm uninstall coffee-v1 -n coffee
-kubectl delete kafkatopics -n kafka --all
-kubectl delete hpa -n coffee --all
-kubectl delete scaledobjects -n coffee --all
+kubectl delete ns coffee
+
+kubectl delete -f kafka-strimzi.yml -n kafka
+kubectl delete ns kafka
+
+helm uninstall strimzi -n strimzi
+kubectl delete ns strimzi
+```
+
+Keda seems to leave some artifacts around even after the chart has been uninstalled. To clean these up:
+```bash
+kubectl delete apiservice v1alpha1.keda.k8s.io
+kubectl delete crd scaledobjects.keda.k8s.io
+kubectl delete crd triggerauthentications.keda.k8s.io
 ```
