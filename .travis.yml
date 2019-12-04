@@ -40,6 +40,6 @@ script:
     # Forward local port (kind does not expose NodePort to host network)
   - kubectl port-forward service/coffee-v1-coffeeshop-service 8080 -n coffee &
     # Wait for port forwarding, test system
-  - sleep 5 && ./ci-test.sh ; export TEST_RC=$?
+  - sleep 5 && ./ci-test.sh 8080 coffee ; export TEST_RC=$?
     # If the test failed, dump the logs for coffeeshop-service and barista-kafka
   - if [ $TEST_RC -ne 0 ]; then kubectl logs deployment/coffee-v1-coffeeshop-service -n coffee ; kubectl logs deployment/coffee-v1-barista-kafka -n coffee ; (exit $TEST_RC) ; fi
