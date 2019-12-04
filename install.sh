@@ -15,6 +15,7 @@ kubectl wait --for=condition=Ready kafkas/my-cluster -n kafka --timeout 180s
 # Install coffeeshop-demo into coffee namespace. Chart defaults to
 # installing kafka cluster into kafka namespace.
 kubectl create ns coffee
+helm dependency update ./coffeeshop-chart
 helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s
 # To pull images from a remote repo, override the image repository.
 # Eg: --set baristaKafka.image.repository=registry:5000/barista-kafka --set baristaHttp.image.repository=registry:5000/barista-http --set coffeeshopService.image.repository=registry:5000/coffeeshop-service
