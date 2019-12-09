@@ -6,13 +6,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 )
 
-func orderCoffee(baseURL string, orders int) {
+func orderCoffee(baseURL string, orders int, name string, wg *sync.WaitGroup) {
 	coffeeURL := baseURL + "/messaging"
 
 	for i := 1; i <= orders; i++ {
-		orderName := fmt.Sprintf("Demo-%v", i)
+		orderName := fmt.Sprintf("%v-%v", name, i)
 		orderJSON := fmt.Sprintf("{\"name\": \"%v\", \"product\": \"espresso\"}", orderName)
 		resp, err := http.Post(coffeeURL, "application/json", strings.NewReader(orderJSON))
 		if err != nil {
@@ -29,4 +30,6 @@ func orderCoffee(baseURL string, orders int) {
 		json.Unmarshal([]byte(body), &order)
 		fmt.Printf("Order %v is: %v\n", i, order)
 	}
+
+	wg.Done()
 }

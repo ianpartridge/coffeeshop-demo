@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 
 	"github.com/r3labs/sse"
 )
@@ -13,7 +14,7 @@ var orders map[string][]Order
 // Record of beverages prepared
 var beverages map[string][]Beverage
 
-func consumeCoffee(baseURL string) {
+func consumeCoffee(baseURL string, wg *sync.WaitGroup) {
 	queueURL := baseURL + "/queue"
 
 	orders = make(map[string][]Order)
@@ -21,6 +22,8 @@ func consumeCoffee(baseURL string) {
 
 	client := sse.NewClient(queueURL)
 	client.SubscribeRaw(consumeEvent)
+
+	wg.Done()
 }
 
 func consumeEvent(msg *sse.Event) {
