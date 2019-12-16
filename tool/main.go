@@ -43,7 +43,9 @@ func main() {
 	}
 	if *consume {
 		wg.Add(1)
-		consumeCoffee(*baseURL, &wg)
+		go consumeCoffee(*baseURL, &wg)
+		wg.Add(1)
+		go monitorOrders(&wg)
 	}
 
 	wg.Wait()

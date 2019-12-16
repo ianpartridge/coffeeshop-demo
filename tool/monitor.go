@@ -4,21 +4,30 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/r3labs/sse"
 )
 
-// Record of orders placed
-var orders map[string][]Order
+func monitorOrders(wg *sync.WaitGroup) {
+	for {
+		<-time.After(10 * time.Second)
+		go printOrders()
+	}
+}
 
-// Record of beverages prepared
-var beverages map[string][]Beverage
+func printOrders() {
+	orders := getAllOrders()
+	fmt.Println("Order status:")
+	for order := range orders {
+		beverageCount := numBeverages(orders[order])
+		orderDetails := getOrder(orders[order])
+		fmt.Printf("%v for %v: completions %v\n", orderDetails.Product, orderDetails.Name, beverageCount)
+	}
+}
 
 func consumeCoffee(baseURL string, wg *sync.WaitGroup) {
 	queueURL := baseURL + "/queue"
-
-	orders = make(map[string][]Order)
-	beverages = make(map[string][]Beverage)
 
 	client := sse.NewClient(queueURL)
 	client.SubscribeRaw(consumeEvent)
@@ -39,24 +48,24 @@ func consumeEvent(msg *sse.Event) {
 	switch state {
 	case "IN_QUEUE":
 		fmt.Printf("%v has ordered a %v: orderId=%v\n", order.Name, order.Product, order.OrderID)
-		existingOrder, present := orders[order.OrderID]
+		existingOrder, present := getOrders(order.OrderID)
 		if !present {
-			orders[order.OrderID] = []Order{order}
+			setOrder(order.OrderID, order)
 		} else {
 			fmt.Printf("ERROR: duplicate order:\n  - new order: %v\n  - existing order: %v\n", order, existingOrder)
-			orders[order.OrderID] = append(orders[order.OrderID], order)
-			fmt.Printf(" - total requests for this order: %v\n", len(orders[order.OrderID]))
+			appendOrder(order.OrderID, order)
+			fmt.Printf(" - total requests for this order: %v\n", numOrders(order.OrderID))
 		}
 	case "READY":
 		barista := beverage.PreparedBy
 		fmt.Printf("Beverage for %v is ready: prepared by %v\n", order.Name, barista)
-		existingBeverage, present := beverages[order.OrderID]
+		existingBeverage, present := getBeverages(order.OrderID)
 		if !present {
-			beverages[order.OrderID] = []Beverage{beverage}
+			setBeverage(order.OrderID, beverage)
 		} else {
 			fmt.Printf("ERROR: duplicate beverage:\n  - new beverage: %v\n  - existing beverage: %v\n", beverage, existingBeverage)
-			beverages[order.OrderID] = append(beverages[order.OrderID], beverage)
-			fmt.Printf(" - total completions for this order: %v\n", len(beverages[order.OrderID]))
+			appendBeverage(order.OrderID, beverage)
+			fmt.Printf(" - total completions for this order: %v\n", numBeverages(order.OrderID))
 		}
 		// Consistency checks
 		if beverage.Customer != order.Name {
