@@ -9,7 +9,7 @@ SERVICE_PORT=${1:-8080}
 NAMESPACE=${2:-"coffee"}
 
 # Test POSTing an order
-response=`curl -s -d"{\"name\":\"Travis\",\"product\":\"frappuccino\"}" -H "Content-Type: application/json" http://localhost:${SERVICE_PORT}/services/messaging`
+response=`curl -s -d"{\"name\":\"Travis\",\"product\":\"frappuccino\"}" -H "Content-Type: application/json" http://localhost:${SERVICE_PORT}/messaging`
 responseRegex='orderId" *: *"[a-z0-9-]+"'
 
 if [[ "$response" =~ $responseRegex ]]; then
@@ -28,7 +28,7 @@ timeout=180
 
 # Stream output from the queue to a temporary file
 echo "" > tmp.out
-curl -s --no-buffer http://localhost:${SERVICE_PORT}/services/queue > tmp.out &
+curl -s --no-buffer http://localhost:${SERVICE_PORT}/queue > tmp.out &
 curlpid=$!
 
 # Poll the temporary file, looking for a line containing the expected response
