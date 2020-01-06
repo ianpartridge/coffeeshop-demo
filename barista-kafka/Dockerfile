@@ -26,7 +26,7 @@ COPY barista-kafka/barista-name.sh /tmp
 
 # Start and stop Liberty to create the shared class cache
 # To capture JVM start options, add: -verbose:gc -Xverbosegclog:/tmp/gc.log.%p
-ENV JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Xtune:virtualized"
+ENV JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Xquickstart -Xms64m -Xmn48m"
 RUN /opt/ol/wlp/bin/server start defaultServer && sleep 5 && /opt/ol/wlp/bin/server stop defaultServer && (java -Xshareclasses:name=liberty-%u,nonfatal,cacheDir=/opt/ol/wlp/output/.classCache,printStats || echo "OK")
 
 EXPOSE 8090
