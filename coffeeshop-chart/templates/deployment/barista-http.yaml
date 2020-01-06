@@ -23,13 +23,3 @@ spec:
         ports:
           - containerPort: 8082
         imagePullPolicy: {{ .Values.baristaHttp.image.pullPolicy }}
-        livenessProbe:
-          httpGet:
-            path: /health/live
-            port: 8082
-          periodSeconds: 10
-          failureThreshold: 10
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 8082

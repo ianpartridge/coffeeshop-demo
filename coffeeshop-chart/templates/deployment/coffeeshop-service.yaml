@@ -25,25 +25,23 @@ spec:
           - containerPort: 8080
         livenessProbe:
           httpGet:
-            path: /health/live
+            path: /
             port: 8080
           periodSeconds: 10
           failureThreshold: 10
         readinessProbe:
-            exec:
-              command:
-                - /bin/bash 
-                - -c
-                - "curl localhost:8080/health/ready | grep '\"CoffeeshopReadinessCheck\",\"status\":\"UP\"'"
+          httpGet:
+            path: /
+            port: 8080
         imagePullPolicy: {{ .Values.coffeeshopService.image.pullPolicy }}
         env:
           - name: KAFKA_HOST
             value: "{{ .Values.kafka.bootstrap.service }}.{{ .Values.kafka.namespace }}:{{ .Values.kafka.bootstrap.port }}"
           - name: BARISTA_HOST
             value: "{{ include "baristaHttp.fullname" . }}:8082"
-        command:
-          - /opt/ol/wlp/bin/server
-          - run
-          - defaultServer
-          - -Dmp.messaging.connector.liberty-kafka.bootstrap.servers=$(KAFKA_HOST)
-          - -Dcom.ibm.runtimes.events.coffeeshop.http.BaristaService/mp-rest/url=http://$(BARISTA_HOST)
+        command: ["java", 
+          "-Dkafka.bootstrap.servers=$(KAFKA_HOST)", 
+          "-Dme.escoffier.quarkus.coffeeshop.http.BaristaService/mp-rest/url=http://$(BARISTA_HOST)", 
+          "-jar", 
+          "app.jar"
+        ]
