@@ -1,50 +1,54 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.ibm.runtimes.events</groupId>
-        <artifactId>coffeeshop-demo</artifactId>
+        <groupId>me.escoffier.quarkus.reactive</groupId>
+        <artifactId>quarkus-coffeeshop-demo</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <artifactId>barista-http</artifactId>
-    <packaging>war</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>io.openliberty.features</groupId>
-            <artifactId>mpHealth-2.0</artifactId>
-            <type>esa</type>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-reactive-streams-operators</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.openliberty.features</groupId>
-            <artifactId>mpConfig-1.3</artifactId>
-            <type>esa</type>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-vertx</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.openliberty.features</groupId>
-            <artifactId>jaxrs-2.1</artifactId>
-            <type>esa</type>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.openliberty.features</groupId>
-            <artifactId>jsonb-1.0</artifactId>
-            <type>esa</type>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-jsonb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jsonp</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>pom.xml</packagingExcludes>
-                </configuration>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -55,14 +59,53 @@
                     </systemProperties>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>io.openliberty.tools</groupId>
-                <artifactId>liberty-maven-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <serverName>defaultServer</serverName>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <activation>
+                <property>
+                    <name>native</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.quarkus</groupId>
+                        <artifactId>quarkus-maven-plugin</artifactId>
+                        <version>${quarkus.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>native-image</goal>
+                                </goals>
+                                <configuration>
+                                    <enableHttpUrlHandler>true</enableHttpUrlHandler>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${surefire-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <systemProperties>
+                                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                                    </systemProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
 </project>

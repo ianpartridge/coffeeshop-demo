@@ -15,14 +15,12 @@ COPY barista-http/src /project/barista-http/src
 # Build and package
 RUN mvn -q -f barista-http/pom.xml package
 
-# Start with OL runtime.
-FROM open-liberty
-
-# Copy app binaries
-
-COPY --from=build --chown=1001:0 /project/barista-http/target/barista-http-1.0-SNAPSHOT.war /opt/ol/wlp/usr/servers/defaultServer/apps
-COPY --from=build --chown=1001:0 /project/barista-http/src/main/liberty/config/server.xml /opt/ol/wlp/usr/servers/defaultServer
+## Create Image
+FROM adoptopenjdk/openjdk8-openj9:x86_64-ubi-minimal-jre8u232-b09_openj9-0.17.0
+COPY --from=build /project/barista-http/target/lib /project/lib
+COPY --from=build /project/barista-http/target/*-runner.jar /project/app.jar
+WORKDIR /project
 
 EXPOSE 8082
 
-# We inherit the CMD to start the Liberty server from the open-liberty image
+CMD ["java", "-Dkafka.bootstrap.servers=kafka:9093", "-jar", "app.jar"]
