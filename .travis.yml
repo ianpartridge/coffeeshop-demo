@@ -29,8 +29,11 @@ script:
     # Install Strimzi custom resource, and wait for cluster creation
   - kubectl apply -f kafka-strimzi.yml -n kafka
   - kubectl wait --for=condition=Ready kafkas/my-cluster -n kafka --timeout 300s
-    # Prepare Helm dependencies (Keda)
-  - helm dependency update ./coffeeshop-chart
+    # Create namespace for Keda
+  - kubectl create ns keda
+    # Install Keda Helm chart
+  - helm repo add kedacore https://kedacore.github.io/charts
+  - helm install keda kedacore/keda -n keda --wait --timeout 300s
     # Deploy to local cluster via helm, into coffee namespace.
   - kubectl create ns coffee
   - helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s --set baristaKafka.image.repository=registry:5000/barista-kafka --set baristaHttp.image.repository=registry:5000/barista-http --set coffeeshopService.image.repository=registry:5000/coffeeshop-service
