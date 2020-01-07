@@ -2,15 +2,18 @@ apiVersion: v2
 name: coffeeshop-chart
 description: A Helm chart for Kubernetes
 
-dependencies:
+#dependencies:
 #  - name: nginx-ingress
 #    version: 1.25.0
 #    repository: https://kubernetes-charts.storage.googleapis.com/
-  - name: keda
-    version: 1.0.0
-    repository: https://kedacore.github.io/charts/
-# Helm 3 does not install the CRDs early enough for us to reference.
-# Strimzi chart must be installed manually first.
+
+# Keda chart must be installed manually first (into its own namespace).
+#  - name: keda
+#    version: 1.0.0
+#    repository: https://kedacore.github.io/charts/
+
+# Strimzi chart must be installed manually first (into its own namespace).
+# The Kafka cluster should then be created (into Values.kafka.namespace, which defaults to 'kafka').
 #  - name: strimzi-kafka-operator
 #    version: 0.14.0
 #    repository: https://strimzi.io/charts/
