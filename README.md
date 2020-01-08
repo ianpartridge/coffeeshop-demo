@@ -29,7 +29,7 @@ You can install everything using Helm by running the supplied `install.sh` (or `
 
 To install manually, the steps are:
 
-1. Install Strimzi
+1. Install the Strimzi operator
 ```bash
 kubectl create ns strimzi
 kubectl create ns kafka
@@ -41,10 +41,15 @@ helm install strimzi strimzi/strimzi-kafka-operator -n strimzi --set watchNamesp
 kubectl apply -f kafka-strimzi.yml -n kafka
 kubectl wait --for=condition=Ready kafkas/my-cluster -n kafka --timeout 180s
 ```
+1. Install the Keda operator
+```bash
+kubectl create ns keda
+helm repo add kedacore https://kedacore.github.io/charts
+helm install keda kedacore/keda -n keda --wait --timeout 300s
+```
 1. Install coffeeshop chart
 ```bash
 kubectl create ns coffee
-helm dependency update ./coffeeshop-chart
 helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s
 ```
 
@@ -52,6 +57,10 @@ Once installed, you can access the service either using the NodePort, or you can
 ```bash
 kubectl port-forward service/coffee-v1-coffeeshop-service 8080:8080 -n coffee
 ```
+
+### Obtaining the node IP and port
+
+If installing to a remote cluster, the `postinstall.sh` (and `postinstall.bat`) script will query Kubernetes to obtain the external IP and NodePort and provide you with the corresponding coffeeshop URL.  This is run at the end of the provided install script.
 
 ### Validating
 
@@ -81,6 +90,9 @@ If you want to clear out everything that was created by the chart, either use th
 ```bash
 helm uninstall coffee-v1 -n coffee
 kubectl delete ns coffee
+
+helm uninstall keda -n keda
+kubectl delete ns keda
 
 kubectl delete -f kafka-strimzi.yml -n kafka
 kubectl delete ns kafka
