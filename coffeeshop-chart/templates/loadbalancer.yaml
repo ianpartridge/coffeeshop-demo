@@ -1,0 +1,19 @@
+{{- if .Values.loadbalancer.enabled -}}
+{{- $fullName := include "loadBalancer.fullname" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "coffeeshopChart.labels" . | indent 4 }}
+spec:
+  type: LoadBalancer
+  selector:
+    app: coffeeshop-service
+    release: {{ .Release.Name }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.loadbalancer.port }}
+    targetPort: 8080
+{{- end }}

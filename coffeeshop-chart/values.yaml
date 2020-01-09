@@ -35,6 +35,12 @@ kafka:
 service:
   type: NodePort
 
+# Enable a load balancer for accessing the coffeeshop service.
+loadbalancer:
+  enabled: false
+  port: 55555
+
+# TODO: figure out how this works
 ingress:
   enabled: false
   annotations: {}

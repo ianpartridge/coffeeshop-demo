@@ -13,6 +13,9 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- define "baristaKafka.fullname" -}}
 {{- printf "%s-barista-kafka" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+{{- define "loadBalancer.fullname" -}}
+{{- printf "%s-loadbalancer" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
