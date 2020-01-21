@@ -34,6 +34,8 @@ script:
     # Install Keda Helm chart
   - helm repo add kedacore https://kedacore.github.io/charts
   - helm install keda kedacore/keda -n keda --wait --timeout 300s
+    # Wait for Keda apiservice to be ready
+  - kubectl wait --for=condition=Available --timeout=60s apiservices/v1beta1.external.metrics.k8s.io 
     # Deploy to local cluster via helm, into coffee namespace.
   - kubectl create ns coffee
   - helm install coffee-v1 ./coffeeshop-chart -n coffee --wait --timeout 300s --set baristaKafka.image.repository=registry:5000/barista-kafka --set baristaHttp.image.repository=registry:5000/barista-http --set coffeeshopService.image.repository=registry:5000/coffeeshop-service
