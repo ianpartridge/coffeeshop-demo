@@ -19,6 +19,9 @@ kubectl create ns keda
 helm repo add kedacore https://kedacore.github.io/charts
 helm install keda kedacore/keda -n keda --wait --timeout 300s
 
+# Wait for Keda apiservice to be ready (otherwise further Helm installs will fail)
+kubectl wait --for=condition=Available --timeout=60s apiservices/v1beta1.external.metrics.k8s.io
+
 # Install coffeeshop-demo into coffee namespace. Requires that Kafka cluster
 # is already created. Contains custom resources:
 # - Strimzi: CRs for orders and queue topics (installed into kafka ns)
