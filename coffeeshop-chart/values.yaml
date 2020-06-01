@@ -5,22 +5,22 @@
 baristaKafka: 
   replicaCount: 1
   image:
-    repository: barista-kafka
-    version: latest
+    repository: docker.io/ianpartridge/coffeeshop-demo
+    version: barista-kafka
     pullPolicy: IfNotPresent
 
 baristaHttp:
   replicaCount: 1
   image:
-    repository: barista-http
-    version: latest
+    repository: docker.io/ianpartridge/coffeeshop-demo
+    version: barista-http
     pullPolicy: IfNotPresent
 
 coffeeshopService:
   replicaCount: 1
   image:
-    repository: coffeeshop-service
-    version: latest
+    repository: docker.io/ianpartridge/coffeeshop-demo
+    version: coffeeshop-service
     pullPolicy: IfNotPresent
 
 # The namespace and service name for the Kafka server.
