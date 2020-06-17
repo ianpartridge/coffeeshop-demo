@@ -28,6 +28,9 @@ COPY --from=build --chown=1001:0 /project/barista-http/src/main/liberty/config/s
 ENV JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Xquickstart -Xms64m -Xmn48m"
 RUN /opt/ol/wlp/bin/server start defaultServer && sleep 5 && /opt/ol/wlp/bin/server stop defaultServer && (java -Xshareclasses:name=liberty-%u,nonfatal,cacheDir=/opt/ol/wlp/output/.classCache,printStats || echo "OK")
 
+# Ensure suitable permissions to support random user id on OpenShift
+RUN chmod -R g=u /opt/ol/wlp/output
+
 EXPOSE 8082
 
 # We inherit the CMD to start the Liberty server from the open-liberty image

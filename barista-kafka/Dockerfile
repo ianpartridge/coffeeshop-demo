@@ -29,6 +29,9 @@ COPY barista-kafka/barista-name.sh /tmp
 ENV JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Xquickstart -Xms64m -Xmn48m"
 RUN /opt/ol/wlp/bin/server start defaultServer && sleep 5 && /opt/ol/wlp/bin/server stop defaultServer && (java -Xshareclasses:name=liberty-%u,nonfatal,cacheDir=/opt/ol/wlp/output/.classCache,printStats || echo "OK")
 
+# Ensure suitable permissions to support random user id on OpenShift
+RUN chmod -R g=u /opt/ol/wlp/output
+
 EXPOSE 8090
 
 # We inherit the CMD to start Liberty from the open-liberty image.
