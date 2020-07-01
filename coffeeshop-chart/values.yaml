@@ -5,6 +5,7 @@
 baristaKafka: 
   replicaCount: 1
   image:
+    registry: docker.io
     repository: ianpartridge/coffeeshop-demo
     version: barista-kafka
     pullPolicy: IfNotPresent
@@ -12,6 +13,7 @@ baristaKafka:
 baristaHttp:
   replicaCount: 1
   image:
+    registry: docker.io
     repository: ianpartridge/coffeeshop-demo
     version: barista-http
     pullPolicy: IfNotPresent
@@ -19,6 +21,7 @@ baristaHttp:
 coffeeshopService:
   replicaCount: 1
   image:
+    registry: docker.io
     repository: ianpartridge/coffeeshop-demo
     version: coffeeshop-service
     pullPolicy: IfNotPresent
