@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: coffeeshop-service
-        image: "{{ .Values.coffeeshopService.image.repository }}:{{ .Values.coffeeshopService.image.version }}"
+        image: "{{ .Values.coffeeshopService.image.registry }}/{{ .Values.coffeeshopService.image.repository }}:{{ .Values.coffeeshopService.image.version }}"
         ports:
           - containerPort: 8080
         livenessProbe:

@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: barista-kafka
-        image: "{{ .Values.baristaKafka.image.repository }}:{{ .Values.baristaKafka.image.version }}"
+        image: "{{ .Values.baristaKafka.image.registry }}/{{ .Values.baristaKafka.image.repository }}:{{ .Values.baristaKafka.image.version }}"
         ports:
           - containerPort: 8090
         imagePullPolicy: {{ .Values.baristaKafka.image.pullPolicy }}
